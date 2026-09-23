@@ -43,27 +43,33 @@
 
         <div class="trip-list">
             <article class="trip-card" data-trip-id="1">
-                <img src="assets/img/lisbon.svg" alt="Краєвид на місто Лісабон з червоними дахами будинків">
-                <h3>Лісабон, Португалія</h3>
-                <p>12–19 червня 2026</p>
-                <p>Прогулянки старим містом, трамвай №28, узбережжя Кашкайшу.</p>
-                <a href="#details" class="view-details-link">Переглянути деталі</a>
+                <img class="trip-card__image" src="assets/img/lisbon.svg" alt="Краєвид на місто Лісабон з червоними дахами будинків">
+                <div class="trip-card__body">
+                    <h3>Лісабон, Португалія</h3>
+                    <p>12–19 червня 2026</p>
+                    <p>Прогулянки старим містом, трамвай №28, узбережжя Кашкайшу.</p>
+                    <a href="#details" class="view-details-link">Переглянути деталі</a>
+                </div>
             </article>
 
             <article class="trip-card" data-trip-id="2">
-                <img src="assets/img/kyoto.svg" alt="Традиційна брама-торії в Кіото на тлі гір">
-                <h3>Кіото, Японія</h3>
-                <p>3–14 листопада 2026</p>
-                <p>Осіннє листя, храми Фушімі-Інарі та Кінкаку-джі.</p>
-                <a href="#details" class="view-details-link">Переглянути деталі</a>
+                <img class="trip-card__image" src="assets/img/kyoto.svg" alt="Традиційна брама-торії в Кіото на тлі гір">
+                <div class="trip-card__body">
+                    <h3>Кіото, Японія</h3>
+                    <p>3–14 листопада 2026</p>
+                    <p>Осіннє листя, храми Фушімі-Інарі та Кінкаку-джі.</p>
+                    <a href="#details" class="view-details-link">Переглянути деталі</a>
+                </div>
             </article>
 
             <article class="trip-card" data-trip-id="3">
-                <img src="assets/img/tbilisi.svg" alt="Панорама старого Тбілісі з фунікулером">
-                <h3>Тбілісі, Грузія</h3>
-                <p>2–9 вересня 2026</p>
-                <p>Сірчані бані, вулиця Шардені, поїздка до Казбегі.</p>
-                <a href="#details" class="view-details-link">Переглянути деталі</a>
+                <img class="trip-card__image" src="assets/img/tbilisi.svg" alt="Панорама старого Тбілісі з фунікулером">
+                <div class="trip-card__body">
+                    <h3>Тбілісі, Грузія</h3>
+                    <p>2–9 вересня 2026</p>
+                    <p>Сірчані бані, вулиця Шардені, поїздка до Казбегі.</p>
+                    <a href="#details" class="view-details-link">Переглянути деталі</a>
+                </div>
             </article>
         </div>
     </section>
@@ -76,18 +82,18 @@
         <p><strong>Опис:</strong> Тиждень у Лісабоні: прогулянки історичними районами Алфама та Байша,
             поїздка історичним трамваєм №28, день на узбережжі в Кашкайші, дегустація паштел-де-ната.</p>
     </section>
-
-    <aside id="budget">
-        <h2>Бюджет подорожі</h2>
-        <p>Авіаквитки: 320 €</p>
-        <p>Проживання (7 ночей): 280 €</p>
-        <p>Харчування та розваги: 210 €</p>
-        <p><strong>Разом: 810 €</strong></p>
-    </aside>
 </main>
 
+<aside id="budget">
+    <h2>Бюджет подорожі</h2>
+    <p class="budget-row">Авіаквитки: 320 €</p>
+    <p class="budget-row">Проживання (7 ночей): 280 €</p>
+    <p class="budget-row">Харчування та розваги: 210 €</p>
+    <p class="budget-row budget-row--total">Разом: 810 €</p>
+</aside>
+
 <footer class="site-footer">
-    <p>Навчальний проєкт «Планувальник подорожей». Практична робота №2, ПВЗ, ФІОТ КПІ. &copy; 2026</p>
+    <p>Навчальний проєкт «Планувальник подорожей». Практична робота №3, ПВЗ, ФІОТ КПІ. &copy; 2026</p>
 </footer>
 
 <script src="js/app.js"></script>
