@@ -1,3 +1,28 @@
+:root {
+    --ocean: #0b4f6c;
+    --teal: #0f766e;
+    --teal-dark: #0b5c56;
+    --sky: #eaf6fb;
+    --sand: #f4a259;
+    --coral: #c2410c;
+    --ink: #12303f;
+    --muted: #4a5b66;
+    --line: #b8d4e0;
+    --field-border: #5f8396;
+    --white: #ffffff;
+    --link: #0b5e86;
+    --planned: #1d5fa8;
+    --ongoing: #1e7b4f;
+    --completed: #5b6770;
+    --font-head: "Montserrat", "Trebuchet MS", system-ui, sans-serif;
+    --font-body: "Open Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --fs-sm: 0.875rem;
+    --fs-base: 1rem;
+    --fs-h3: 1.25rem;
+    --fs-h2: 1.5rem;
+    --fs-h1: 1.75rem;
+}
+
 *,
 *::before,
 *::after {
@@ -6,20 +31,33 @@
 
 body {
     margin: 0;
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    font-size: 1rem;
+    font-family: var(--font-body), sans-serif;
+    font-size: var(--fs-base);
     line-height: 1.5;
-    color: #264653;
-    background-color: #f4e9d8;
+    color: var(--ink);
+    background-color: var(--sky);
+}
+
+h1,
+h2,
+h3 {
+    font-family: var(--font-head), sans-serif;
+    line-height: 1.25;
 }
 
 a {
-    color: #2a9d8f;
+    color: var(--link);
 }
 
 img {
     max-width: 100%;
     height: auto;
+}
+
+a:focus-visible,
+button:focus-visible {
+    outline: 3px solid var(--ocean);
+    outline-offset: 2px;
 }
 
 .site-header {
@@ -28,27 +66,28 @@ img {
     align-items: flex-start;
     flex-wrap: wrap;
     gap: 0.75rem;
-    background: linear-gradient(135deg, #2a9d8f, #264653);
-    color: #ffffff;
-    padding: 1rem;
-    border-bottom: 4px solid #e9c46a;
+    background: linear-gradient(135deg, var(--ocean), var(--teal));
+    color: var(--white);
+    padding: 1.25rem 1rem;
+    border-bottom: 4px solid var(--sand);
 }
 
 .site-header h1 {
     margin: 0;
-    font-size: 1.5rem;
+    font-size: var(--fs-h1);
+    font-weight: 800;
 }
 
 .site-nav {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem 1.25rem;
+    gap: 0.5rem 1.5rem;
 }
 
 .site-nav a {
-    color: #f4e9d8;
+    color: var(--sky);
     text-decoration: none;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .site-nav a:hover {
@@ -58,9 +97,9 @@ img {
 .layout {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 1rem;
+    gap: 1.5rem;
     max-width: 960px;
-    margin: 1rem auto;
+    margin: 1.5rem auto;
     padding: 0 1rem;
 }
 
@@ -69,11 +108,11 @@ img {
 }
 
 section {
-    background: #ffffff;
-    border-radius: 10px;
-    padding: 1rem;
-    margin-bottom: 1rem;
-    box-shadow: 0 1px 4px rgba(38, 70, 83, 0.12);
+    background: var(--white);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px rgba(11, 79, 108, 0.12);
 }
 
 section:last-child {
@@ -81,15 +120,23 @@ section:last-child {
 }
 
 section h2 {
-    color: #264653;
-    margin-top: 0;
+    color: var(--ocean);
+    font-size: var(--fs-h2);
+    font-weight: 700;
+    margin: 0 0 1rem 0;
+}
+
+section h3 {
+    font-size: var(--fs-h3);
+    color: var(--ink);
+    margin: 0 0 0.75rem 0;
 }
 
 .trip-form {
     display: grid;
     gap: 0.75rem;
     max-width: 420px;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
 }
 
 .form-row {
@@ -99,118 +146,197 @@ section h2 {
 }
 
 .form-row label {
-    font-size: 0.9rem;
-    font-weight: 600;
+    font-size: var(--fs-sm);
+    font-weight: 700;
 }
 
 .form-row input,
 .form-row textarea {
-    padding: 0.5rem;
-    border: 1px solid #cfd8dc;
-    border-radius: 6px;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--field-border);
+    border-radius: 8px;
     font: inherit;
+    color: var(--ink);
+    background: var(--white);
+}
+
+.form-row input::placeholder,
+.form-row textarea::placeholder {
+    color: var(--muted);
 }
 
 .form-row input:focus,
 .form-row textarea:focus {
-    outline: none;
-    border-color: #2a9d8f;
+    outline: 3px solid var(--ocean);
+    outline-offset: 1px;
+    border-color: var(--ocean);
 }
 
 .trip-form button {
     justify-self: start;
-    padding: 0.6rem 1.2rem;
-    background: #2a9d8f;
-    color: #fff;
+    min-height: 44px;
+    padding: 0.6rem 1.5rem;
+    background: var(--teal);
+    color: var(--white);
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
+    font-family: var(--font-head), sans-serif;
+    font-size: var(--fs-base);
+    font-weight: 700;
     cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
 }
 
 .trip-form button:hover {
-    background: #21867a;
+    background: var(--teal-dark);
+    transform: translateY(-1px);
 }
 
 .trip-list {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 1.25rem;
+    gap: 1.5rem;
 }
 
 .trip-card {
-    background: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(38, 70, 83, 0.15);
+    display: flex;
+    flex-direction: column;
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(11, 79, 108, 0.12);
     overflow: hidden;
-    transition: box-shadow 0.2s ease;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .trip-card:hover {
-    box-shadow: 0 4px 14px rgba(38, 70, 83, 0.25);
+    box-shadow: 0 8px 20px rgba(11, 79, 108, 0.22);
+    transform: translateY(-2px);
 }
 
 .trip-card__image {
     width: 100%;
-    height: 140px;
+    height: 160px;
     object-fit: cover;
     display: block;
     margin: 0;
 }
 
 .trip-card__body {
-    padding: 14px;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1.25rem;
 }
 
 .trip-card__body h3 {
-    margin-top: 0;
-    color: #264653;
+    margin: 0;
+    font-size: var(--fs-h3);
+    font-weight: 700;
+    color: var(--ocean);
+}
+
+.trip-card__body p {
+    margin: 0;
+}
+
+.trip-card__dates {
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--muted);
+}
+
+.status {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    gap: 0.35rem;
+    padding: 0.2rem 0.75rem;
+    border-radius: 999px;
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    color: var(--white);
+}
+
+.status--planned {
+    background: var(--planned);
+}
+
+.status--ongoing {
+    background: var(--ongoing);
+}
+
+.status--completed {
+    background: var(--completed);
 }
 
 .view-details-link {
     display: inline-block;
-    margin-top: 0.5rem;
-    color: #2a9d8f;
-    font-weight: 600;
+    margin-top: auto;
+    padding-top: 0.5rem;
+    color: var(--link);
+    font-weight: 700;
 }
 
 #details img {
     width: 100%;
     max-width: 400px;
     height: auto;
-    border-radius: 10px;
+    border-radius: 12px;
     display: block;
     margin-bottom: 1rem;
 }
 
+#details p {
+    max-width: 65ch;
+    margin: 0 0 0.75rem 0;
+}
+
 #budget {
-    padding: 1rem;
-    background: #e9c46a;
-    border-radius: 10px;
-    color: #264653;
     align-self: start;
+    padding: 1.25rem;
+    background: var(--white);
+    border-top: 6px solid var(--sand);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(11, 79, 108, 0.12);
+    color: var(--ink);
 }
 
 #budget h2 {
-    margin-top: 0;
+    margin: 0 0 1rem 0;
+    font-size: var(--fs-h2);
+    color: var(--ocean);
 }
 
 .budget-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
     padding: 0.6rem 0;
     margin: 0;
-    border-bottom: 1px solid rgba(38, 70, 83, 0.25);
+    border-bottom: 1px solid var(--line);
 }
 
 .budget-row--total {
-    font-weight: 700;
-    font-size: 1.15rem;
+    align-items: baseline;
+    padding-top: 1rem;
     border-bottom: none;
+    font-weight: 700;
+}
+
+.budget-amount {
+    font-family: var(--font-head), sans-serif;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--coral);
 }
 
 .site-footer {
     text-align: center;
     padding: 1.5rem;
-    color: #6b7c85;
-    font-size: 0.85rem;
+    color: var(--muted);
+    font-size: var(--fs-sm);
 }
 
 @media (min-width: 600px) {
@@ -218,20 +344,25 @@ section h2 {
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
-        padding: 1.25rem 1.5rem;
+        padding: 1.5rem;
     }
 
     .site-header h1 {
-        font-size: 1.75rem;
+        font-size: 2.25rem;
     }
 
     .layout {
         padding: 0 1.5rem;
-        margin: 1.5rem auto;
+        margin: 2rem auto;
     }
 
     section {
-        padding: 1.5rem;
+        padding: 1.75rem;
+    }
+
+    section h2,
+    #budget h2 {
+        font-size: 1.75rem;
     }
 
     .trip-list {
@@ -241,23 +372,23 @@ section h2 {
 
 @media (min-width: 1024px) {
     .site-header {
-        padding: 1.5rem 2rem;
-    }
-
-    .site-header h1 {
-        font-size: 2rem;
+        padding: 1.75rem 2rem;
     }
 
     .layout {
         grid-template-columns: 3fr 1fr;
         gap: 24px;
         max-width: 1280px;
-        margin: 2rem auto;
+        margin: 2.5rem auto;
         padding: 0 2rem;
     }
 
     .trip-list {
         grid-template-columns: repeat(3, 1fr);
         gap: 1.5rem;
+    }
+
+    .budget-amount {
+        font-size: 2rem;
     }
 }
