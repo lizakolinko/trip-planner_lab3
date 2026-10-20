@@ -111,7 +111,7 @@ function renderTrips(list) {
         dates.classList.add('trip-card__dates');
         dates.textContent = trip.dates;
 
-        details.textContent = `${trip.days} днів, ${trip.budget} €`;
+        details.textContent = `${trip.days} днів, ${trip.budget} грн`;
 
         link.classList.add('view-details-link');
         link.href = '#details';
