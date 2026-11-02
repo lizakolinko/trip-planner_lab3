@@ -17,6 +17,7 @@
     <nav class="site-nav">
         <a href="#trips">Мої подорожі</a>
         <a href="#details">Деталі подорожі</a>
+        <a href="#country">Країна</a>
     </nav>
 </header>
 
@@ -85,6 +86,22 @@
             <h2>Деталі обраної подорожі</h2>
             <div id="details-content"></div>
         </section>
+
+        <section id="country">
+            <h2>Інформація про країну</h2>
+            <form class="trip-form country-form" id="country-form" action="#" method="get">
+                <div class="form-row">
+                    <label for="country-input">Назва країни (англійською)</label>
+                    <input type="text" id="country-input" name="country" value="Portugal" placeholder="Наприклад, Japan" required>
+                </div>
+                <div class="country-actions">
+                    <button type="submit" id="country-search-button">Знайти</button>
+                    <button type="button" id="country-refresh-button">Оновити</button>
+                </div>
+            </form>
+            <p class="country-status" id="country-status" aria-live="polite"></p>
+            <div class="country-list" id="country-list"></div>
+        </section>
     </main>
 
     <aside id="budget">
@@ -109,7 +126,7 @@
 </div>
 
 <footer class="site-footer">
-    <p>Навчальний проєкт «Планувальник подорожей». Практична робота №8, ПВЗ, ФІОТ КПІ. &copy; 2026</p>
+    <p>Навчальний проєкт «Планувальник подорожей». Практична робота №9, ПВЗ, ФІОТ КПІ. &copy; 2026</p>
 </footer>
 
 <script src="js/app.js"></script>

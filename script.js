@@ -219,7 +219,7 @@ function updateCostHint() {
     costHint.classList.toggle('warning', tooLow);
 }
 
-// Обробник кліку на картці подорожі (делегування на контейнер): виділяє картку й показує її деталі
+// Обробник події click на картці подорожі (делегування на контейнер): виділяє картку й показує її деталі
 listContainer.addEventListener('click', event => {
     const card = event.target.closest('.trip-card');
 
@@ -295,3 +295,144 @@ for (const trip of trips) {
 renderTrips(trips);
 updateTripsCount(trips);
 showTripDetails(trips[0]);
+
+const COUNTRY_API_URL = 'https://restcountries.com/v3.1/name/';
+const COUNTRY_FIELDS = 'name,capital,population,flags';
+
+const countryForm = document.querySelector('#country-form');
+const countryInput = document.querySelector('#country-input');
+const countrySearchButton = document.querySelector('#country-search-button');
+const countryRefreshButton = document.querySelector('#country-refresh-button');
+const countryStatus = document.querySelector('#country-status');
+const countryList = document.querySelector('#country-list');
+
+let lastCountryQuery = countryInput.value.trim();
+
+// Вмикає або вимикає стан завантаження: показує текст і блокує кнопки на час запиту
+function setCountryLoading(isLoading) {
+    countrySearchButton.disabled = isLoading;
+    countryRefreshButton.disabled = isLoading;
+
+    if (isLoading) {
+        countryStatus.classList.remove('error');
+        countryStatus.textContent = 'Завантаження…';
+    }
+}
+
+// Виводить користувачу зрозуміле повідомлення про помилку в окремий елемент
+function showCountryError(message) {
+    countryStatus.textContent = message;
+    countryStatus.classList.add('error');
+}
+
+/**
+ * @typedef {Object} Country
+ * @property {{common: string}} name
+ * @property {string[]} [capital]
+ * @property {number} population
+ * @property {{png: string}} flags
+ */
+
+/**
+ * Виводить знайдені країни на сторінку: очищає контейнер і створює картку з прапором, назвою, столицею та населенням
+ * @param {Country[]} list
+ */
+function renderCountries(list) {
+    countryList.innerHTML = '';
+
+    list.forEach(country => {
+        const card = document.createElement('article');
+        const flag = document.createElement('img');
+        const body = document.createElement('div');
+        const title = document.createElement('h3');
+        const capital = document.createElement('p');
+        const population = document.createElement('p');
+
+        const capitalText = Array.isArray(country.capital) && country.capital.length > 0
+            ? country.capital.join(', ')
+            : 'немає даних';
+
+        card.classList.add('country-card');
+
+        flag.classList.add('country-card__flag');
+        flag.src = country.flags.png;
+        flag.alt = `Прапор країни ${country.name.common}`;
+
+        body.classList.add('country-card__body');
+
+        title.textContent = country.name.common;
+        capital.textContent = `Столиця: ${capitalText}`;
+        population.textContent = `Населення: ${country.population.toLocaleString('uk-UA')} осіб`;
+
+        body.append(title, capital, population);
+        card.append(flag, body);
+        countryList.append(card);
+    });
+}
+
+// Виконує запит до REST Countries API (https://restcountries.com), перевіряє статус відповіді та повертає розібраний JSON
+async function fetchCountries(query) {
+    const response = await fetch(`${COUNTRY_API_URL}${encodeURIComponent(query)}?fields=${COUNTRY_FIELDS}`);
+
+    if (!response.ok) {
+        const error = new Error(`Сервер відповів кодом ${response.status}`);
+        error.status = response.status;
+        throw error;
+    }
+
+    const data = await response.json();
+
+    if (!Array.isArray(data) || data.length === 0) {
+        const error = new Error('Порожня відповідь сервера');
+        error.status = 404;
+        throw error;
+    }
+
+    return data;
+}
+
+// Асинхронно завантажує дані про країну з REST Countries API (https://restcountries.com) і виводить їх на сторінку з обробкою помилок
+async function loadCountry(query) {
+    setCountryLoading(true);
+
+    try {
+        const data = await fetchCountries(query);
+
+        renderCountries(data);
+        countryStatus.textContent = `Знайдено країн: ${data.length}`;
+    } catch (error) {
+        renderCountries([]);
+
+        if (error.status === 404) {
+            showCountryError('Країну не знайдено, перевірте написання');
+        } else {
+            showCountryError('Не вдалося завантажити дані. Спробуйте пізніше.');
+        }
+
+        console.error(error);
+    } finally {
+        setCountryLoading(false);
+    }
+}
+
+// Обробник надсилання форми пошуку: скасовує перезавантаження й запускає запит за введеною назвою
+countryForm.addEventListener('submit', event => {
+    event.preventDefault();
+
+    const query = countryInput.value.trim();
+
+    if (query === '') {
+        showCountryError('Введіть назву країни');
+        return;
+    }
+
+    lastCountryQuery = query;
+    void loadCountry(query);
+});
+
+// Обробник кнопки «Оновити»: повторює останній запит без перезавантаження сторінки
+countryRefreshButton.addEventListener('click', () => {
+    void loadCountry(lastCountryQuery);
+});
+
+void loadCountry(lastCountryQuery);
