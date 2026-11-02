@@ -297,7 +297,6 @@ updateTripsCount(trips);
 showTripDetails(trips[0]);
 
 const COUNTRY_API_URL = 'https://restcountries.com/v3.1/name/';
-const COUNTRY_FIELDS = 'name,capital,population,flags';
 
 const countryForm = document.querySelector('#country-form');
 const countryInput = document.querySelector('#country-input');
@@ -329,7 +328,7 @@ function showCountryError(message) {
  * @typedef {Object} Country
  * @property {{common: string}} name
  * @property {string[]} [capital]
- * @property {number} population
+ * @property {number} [population]
  * @property {{png: string}} flags
  */
 
@@ -352,6 +351,10 @@ function renderCountries(list) {
             ? country.capital.join(', ')
             : 'немає даних';
 
+        const populationText = typeof country.population === 'number'
+            ? `${country.population.toLocaleString('uk-UA')} осіб`
+            : 'немає даних';
+
         card.classList.add('country-card');
 
         flag.classList.add('country-card__flag');
@@ -362,7 +365,7 @@ function renderCountries(list) {
 
         title.textContent = country.name.common;
         capital.textContent = `Столиця: ${capitalText}`;
-        population.textContent = `Населення: ${country.population.toLocaleString('uk-UA')} осіб`;
+        population.textContent = `Населення: ${populationText}`;
 
         body.append(title, capital, population);
         card.append(flag, body);
@@ -370,9 +373,9 @@ function renderCountries(list) {
     });
 }
 
-// Виконує запит до REST Countries API (https://restcountries.com), перевіряє статус відповіді та повертає розібраний JSON
+// Виконує запит до REST Countries API (https://restcountries.com/v3.1/name/), перевіряє статус відповіді та повертає масив країн
 async function fetchCountries(query) {
-    const response = await fetch(`${COUNTRY_API_URL}${encodeURIComponent(query)}?fields=${COUNTRY_FIELDS}`);
+    const response = await fetch(`${COUNTRY_API_URL}${encodeURIComponent(query)}`);
 
     if (!response.ok) {
         const error = new Error(`Сервер відповів кодом ${response.status}`);
@@ -396,10 +399,10 @@ async function loadCountry(query) {
     setCountryLoading(true);
 
     try {
-        const data = await fetchCountries(query);
+        const countries = await fetchCountries(query);
 
-        renderCountries(data);
-        countryStatus.textContent = `Знайдено країн: ${data.length}`;
+        renderCountries(countries);
+        countryStatus.textContent = `Знайдено країн: ${countries.length}`;
     } catch (error) {
         renderCountries([]);
 
