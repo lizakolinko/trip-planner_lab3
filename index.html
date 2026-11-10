@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+    <script src="https://unpkg.com/vue@3.5.13/dist/vue.global.js" defer></script>
     <script src="script.js" defer></script>
 </head>
 <body>
@@ -23,69 +24,55 @@
 
 <div class="layout">
     <main>
-        <section id="trips">
-            <h2>Мої подорожі</h2>
+        <div id="app" v-cloak>
+            <section id="trips">
+                <h2>Мої подорожі</h2>
 
-            <h3>Додати нову подорож</h3>
-            <form class="trip-form" id="trip-form" action="#" method="post">
-                <div class="form-row">
-                    <label for="destination-input">Напрямок</label>
-                    <input type="text" id="destination-input" name="destination" placeholder="Наприклад, Лісабон" required>
-                </div>
-                <div class="form-row">
-                    <label for="days-input">Кількість днів</label>
-                    <input type="number" id="days-input" name="days" min="1" step="1" placeholder="Наприклад, 7" required>
-                </div>
-                <div class="form-row">
-                    <label for="budget-input">Бюджет, грн</label>
-                    <input type="number" id="budget-input" name="budget" min="0" placeholder="Наприклад, 900" required>
-                </div>
-                <p class="cost-hint" id="cost-hint" aria-live="polite"></p>
-                <button type="submit">Додати подорож</button>
-            </form>
-
-            <p class="trips-count" id="trips-count"></p>
-
-            <div class="trip-list" id="trips-list">
-                <article class="trip-card" data-trip-id="1">
-                    <img class="trip-card__image" src="assets/img/lisbon.svg" alt="Краєвид на місто Лісабон з червоними дахами будинків">
-                    <div class="trip-card__body">
-                        <span class="status status--completed"><span aria-hidden="true">✔</span> Завершено</span>
-                        <h3>Лісабон, Португалія</h3>
-                        <p class="trip-card__dates">12–19 червня 2026</p>
-                        <p>Прогулянки старим містом, трамвай №28, узбережжя Кашкайшу.</p>
-                        <a href="#details" class="view-details-link">Переглянути деталі</a>
+                <h3>Додати нову подорож</h3>
+                <form class="trip-form" id="trip-form" action="#" method="post" @submit.prevent="addTrip">
+                    <div class="form-row">
+                        <label for="destination-input">Напрямок</label>
+                        <input type="text" id="destination-input" name="destination" placeholder="Наприклад, Лісабон"
+                               ref="destinationInput" v-model="form.destination" @input="clearDestinationError" required>
                     </div>
-                </article>
-
-                <article class="trip-card" data-trip-id="2">
-                    <img class="trip-card__image" src="assets/img/kyoto.svg" alt="Традиційна брама-торії в Кіото на тлі гір">
-                    <div class="trip-card__body">
-                        <span class="status status--planned"><span aria-hidden="true">✈</span> Заплановано</span>
-                        <h3>Кіото, Японія</h3>
-                        <p class="trip-card__dates">3–14 листопада 2026</p>
-                        <p>Осіннє листя, храми Фушімі-Інарі та Кінкаку-джі.</p>
-                        <a href="#details" class="view-details-link">Переглянути деталі</a>
+                    <div class="form-row">
+                        <label for="days-input">Кількість днів</label>
+                        <input type="number" id="days-input" name="days" min="1" step="1" placeholder="Наприклад, 7"
+                               v-model.number="form.days" required>
                     </div>
-                </article>
-
-                <article class="trip-card" data-trip-id="3">
-                    <img class="trip-card__image" src="assets/img/tbilisi.svg" alt="Панорама старого Тбілісі з фунікулером">
-                    <div class="trip-card__body">
-                        <span class="status status--ongoing"><span aria-hidden="true">●</span> Триває</span>
-                        <h3>Тбілісі, Грузія</h3>
-                        <p class="trip-card__dates">2–9 вересня 2026</p>
-                        <p>Сірчані бані, вулиця Шардені, поїздка до Казбегі.</p>
-                        <a href="#details" class="view-details-link">Переглянути деталі</a>
+                    <div class="form-row">
+                        <label for="budget-input">Бюджет, грн</label>
+                        <input type="number" id="budget-input" name="budget" min="0" placeholder="Наприклад, 900"
+                               v-model.number="form.budget" required>
                     </div>
-                </article>
-            </div>
-        </section>
+                    <p class="cost-hint" id="cost-hint" :class="{ warning: costHint && costHint.warning }" aria-live="polite">{{ costHint ? costHint.text : '' }}</p>
+                    <button type="submit">Додати подорож</button>
+                </form>
 
-        <section id="details">
-            <h2>Деталі обраної подорожі</h2>
-            <div id="details-content"></div>
-        </section>
+                <p class="trips-count" id="trips-count">Кількість подорожей: {{ trips.length }}</p>
+
+                <div class="trip-list" id="trips-list">
+                    <trip-card v-for="trip in trips" :key="trip.id"
+                               :id="trip.id" :destination="trip.destination" :days="trip.days" :budget="trip.budget"
+                               :dates="trip.dates" :status="trip.status" :image="trip.image" :image-alt="trip.imageAlt"
+                               :selected="trip.id === selectedTripId" :budget-limit="budgetLimit" @select="selectTrip"></trip-card>
+                </div>
+            </section>
+
+            <section id="details">
+                <h2>Деталі обраної подорожі</h2>
+                <div id="details-content" v-if="selectedTrip">
+                    <img v-if="selectedTrip.image" :src="selectedTrip.image" :alt="selectedTrip.imageAlt">
+                    <p><status-badge :status="selectedTrip.status"></status-badge></p>
+                    <p><strong>Напрямок:</strong> {{ selectedTrip.destination }}</p>
+                    <p><strong>Дати:</strong> {{ selectedTrip.dates }}</p>
+                    <p><strong>Тривалість:</strong> {{ selectedTrip.days }} днів</p>
+                    <p><strong>Бюджет:</strong> {{ selectedTrip.budget }} грн</p>
+                    <p><strong>Вартість на день:</strong> {{ selectedCostPerDay }} грн</p>
+                    <p><strong>Опис:</strong> {{ selectedTrip.description }}</p>
+                </div>
+            </section>
+        </div>
 
         <section id="country">
             <h2>Інформація про країну</h2>
@@ -126,7 +113,7 @@
 </div>
 
 <footer class="site-footer">
-    <p>Навчальний проєкт «Планувальник подорожей». Практична робота №9, ПВЗ, ФІОТ КПІ. &copy; 2026</p>
+    <p>Навчальний проєкт «Планувальник подорожей». Практична робота №10, ПВЗ, ФІОТ КПІ. &copy; 2026</p>
 </footer>
 
 <script src="js/app.js"></script>

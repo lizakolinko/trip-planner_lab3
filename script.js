@@ -1,300 +1,183 @@
+// Обрано Vue 3: простіший шаблонний синтаксис, не потрібні JSX і Babel, сторінка завантажується швидше
+
 console.log('script.js підключено');
 
-document.querySelectorAll('.trip-card').forEach(card => card.remove());
+// Компонент мітки статусу: отримує ключ статусу через props і показує іконку з текстом
+const StatusBadge = {
+    props: ['status'],
+    computed: {
+        info() {
+            const labels = {
+                completed: { icon: '✔', text: 'Завершено' },
+                planned: { icon: '✈', text: 'Заплановано' },
+                ongoing: { icon: '●', text: 'Триває' }
+            };
 
-const BUDGET_LIMIT = 1000;
-const MIN_COST_PER_DAY = 50;
-
-const trips = [
-    {
-        id: 1,
-        destination: 'Лісабон, Португалія',
-        days: 8,
-        budget: 810,
-        dates: '12–19 червня 2026',
-        status: 'completed',
-        image: 'assets/img/lisbon.svg',
-        imageAlt: 'Краєвид на місто Лісабон з червоними дахами будинків',
-        description: 'Тиждень у Лісабоні: прогулянки історичними районами Алфама та Байша, поїздка історичним трамваєм №28, день на узбережжі в Кашкайші, дегустація паштел-де-ната.'
+            return labels[this.status];
+        }
     },
-    {
-        id: 2,
-        destination: 'Кіото, Японія',
-        days: 12,
-        budget: 2400,
-        dates: '3–14 листопада 2026',
-        status: 'planned',
-        image: 'assets/img/kyoto.svg',
-        imageAlt: 'Традиційна брама-торії в Кіото на тлі гір',
-        description: 'Осіннє листя, храми Фушімі-Інарі та Кінкаку-джі.'
-    },
-    {
-        id: 3,
-        destination: 'Тбілісі, Грузія',
-        days: 8,
-        budget: 650,
-        dates: '2–9 вересня 2026',
-        status: 'ongoing',
-        image: 'assets/img/tbilisi.svg',
-        imageAlt: 'Панорама старого Тбілісі з фунікулером',
-        description: 'Сірчані бані, вулиця Шардені, поїздка до Казбегі.'
-    }
-];
-
-const STATUS_LABELS = {
-    completed: { icon: '✔', text: 'Завершено' },
-    planned: { icon: '✈', text: 'Заплановано' },
-    ongoing: { icon: '●', text: 'Триває' }
+    template: `
+        <span class="status" :class="'status--' + status">
+            <span aria-hidden="true">{{ info.icon }}</span> {{ info.text }}
+        </span>`
 };
 
-const listContainer = document.querySelector('#trips-list');
-const detailsContent = document.querySelector('#details-content');
-const form = document.querySelector('#trip-form');
-const destinationInput = document.querySelector('#destination-input');
-const daysInput = document.querySelector('#days-input');
-const budgetInput = document.querySelector('#budget-input');
-const costHint = document.querySelector('#cost-hint');
-
-let selectedTripId = trips[0].id;
-
-// Визначає категорію подорожі за бюджетом: «дорога», якщо бюджет перевищує ліміт, інакше «бюджетна»
-function getBudgetCategory(budget) {
-    if (budget > BUDGET_LIMIT) {
-        return 'дорога';
-    } else {
-        return 'бюджетна';
-    }
-}
-
-// Обходить масив подорожей циклом, виводить кожну з категорією та підсумки: кількість, загальний і середній бюджет
-function printTripsSummary(list) {
-    let totalBudget = 0;
-
-    for (const trip of list) {
-        const category = getBudgetCategory(trip.budget);
-        console.log(`${trip.destination}: ${trip.days} дн., ${trip.budget} (${category})`);
-        totalBudget += trip.budget;
-    }
-
-    console.log(`Кількість подорожей: ${list.length}`);
-    console.log(`Загальний бюджет: ${totalBudget}`);
-    console.log(`Середній бюджет: ${Math.round(totalBudget / list.length)}`);
-}
-
-// Стрілкова функція: повертає вартість одного дня подорожі, округлену до цілого
-const costPerDay = trip => Math.round(trip.budget / trip.days);
-
-// Повертає наступний вільний id для нової подорожі
-function getNextId(list) {
-    return Math.max(...list.map(trip => trip.id)) + 1;
-}
-
-// Створює мітку статусу подорожі з іконкою та текстом
-function createStatusBadge(statusKey) {
-    const label = STATUS_LABELS[statusKey];
-    const badge = document.createElement('span');
-    const icon = document.createElement('span');
-
-    badge.classList.add('status', `status--${statusKey}`);
-    icon.textContent = label.icon;
-    icon.setAttribute('aria-hidden', 'true');
-    badge.append(icon, ` ${label.text}`);
-
-    return badge;
-}
-
-// Виводить список на сторінку: очищає контейнер і для кожної подорожі створює картку з назвою, умовами, статусом, атрибутами та класами
-function renderTrips(list) {
-    listContainer.innerHTML = '';
-
-    list.forEach(trip => {
-        const card = document.createElement('article');
-        const body = document.createElement('div');
-        const title = document.createElement('h3');
-        const dates = document.createElement('p');
-        const details = document.createElement('p');
-        const link = document.createElement('a');
-
-        card.classList.add('trip-card');
-        card.classList.toggle('selected', trip.id === selectedTripId);
-        card.dataset.tripId = String(trip.id);
-        card.dataset.costPerDay = String(costPerDay(trip));
-
-        if (getBudgetCategory(trip.budget) === 'дорога') {
-            card.classList.add('expensive');
-        } else {
-            card.classList.add('budget');
+// Компонент TripCard (props: destination, days, budget та дані для відображення): вартість дня обчислюється автоматично, натискання на картку повідомляє батьківському компоненту через $emit
+const TripCard = {
+    components: { StatusBadge },
+    props: {
+        id: Number,
+        destination: String,
+        days: Number,
+        budget: Number,
+        dates: String,
+        status: String,
+        image: String,
+        imageAlt: String,
+        selected: Boolean,
+        budgetLimit: Number
+    },
+    emits: ['select'],
+    computed: {
+        costPerDay() {
+            return this.budget / this.days;
+        },
+        category() {
+            return this.budget > this.budgetLimit ? 'expensive' : 'budget';
         }
+    },
+    template: `
+        <article class="trip-card" :class="[category, { selected: selected }]"
+                 :data-trip-id="id" :data-cost-per-day="Math.round(costPerDay)" @click="$emit('select', id)">
+            <img v-if="image" class="trip-card__image" :src="image" :alt="imageAlt">
+            <div class="trip-card__body">
+                <status-badge :status="status"></status-badge>
+                <h3>{{ destination }}</h3>
+                <p class="trip-card__dates">{{ dates }}</p>
+                <p>{{ days }} днів, {{ budget }} грн</p>
+                <p class="trip-card__cost">Вартість на день: {{ Math.round(costPerDay) }} грн</p>
+                <a class="view-details-link" href="#details">Переглянути деталі</a>
+            </div>
+        </article>`
+};
 
-        if (trip.image) {
-            const image = document.createElement('img');
-            image.classList.add('trip-card__image');
-            image.src = trip.image;
-            image.alt = trip.imageAlt;
-            card.append(image);
+// Кореневий застосунок: ручне виведення списку функцією renderTrips із практичної №7 замінено компонентом TripCard (v-for), а масив подорожей тепер лежить у реактивному стані data()
+Vue.createApp({
+    components: { TripCard, StatusBadge },
+    data() {
+        return {
+            trips: [
+                {
+                    id: 1,
+                    destination: 'Лісабон, Португалія',
+                    days: 8,
+                    budget: 810,
+                    dates: '12–19 червня 2026',
+                    status: 'completed',
+                    image: 'assets/img/lisbon.svg',
+                    imageAlt: 'Краєвид на місто Лісабон з червоними дахами будинків',
+                    description: 'Тиждень у Лісабоні: прогулянки історичними районами Алфама та Байша, поїздка історичним трамваєм №28, день на узбережжі в Кашкайші, дегустація паштел-де-ната.'
+                },
+                {
+                    id: 2,
+                    destination: 'Кіото, Японія',
+                    days: 12,
+                    budget: 2400,
+                    dates: '3–14 листопада 2026',
+                    status: 'planned',
+                    image: 'assets/img/kyoto.svg',
+                    imageAlt: 'Традиційна брама-торії в Кіото на тлі гір',
+                    description: 'Осіннє листя, храми Фушімі-Інарі та Кінкаку-джі.'
+                },
+                {
+                    id: 3,
+                    destination: 'Тбілісі, Грузія',
+                    days: 8,
+                    budget: 650,
+                    dates: '2–9 вересня 2026',
+                    status: 'ongoing',
+                    image: 'assets/img/tbilisi.svg',
+                    imageAlt: 'Панорама старого Тбілісі з фунікулером',
+                    description: 'Сірчані бані, вулиця Шардені, поїздка до Казбегі.'
+                }
+            ],
+            budgetLimit: 1000,
+            minCostPerDay: 50,
+            selectedTripId: 1,
+            form: {
+                destination: '',
+                days: '',
+                budget: ''
+            }
+        };
+    },
+    computed: {
+        selectedTrip() {
+            return this.trips.find(trip => trip.id === this.selectedTripId) || null;
+        },
+        selectedCostPerDay() {
+            return this.selectedTrip ? Math.round(this.selectedTrip.budget / this.selectedTrip.days) : 0;
+        },
+        costHint() {
+            const days = Number(this.form.days);
+            const budget = Number(this.form.budget);
+
+            if (this.form.days === '' || this.form.budget === '' || days < 1 || budget < 0) {
+                return null;
+            }
+
+            const perDay = Math.round(budget / days);
+
+            if (perDay < this.minCostPerDay) {
+                return {
+                    text: `Бюджет на день: ${perDay} грн. Це менше за ${this.minCostPerDay} грн, сума може бути замалою`,
+                    warning: true
+                };
+            }
+
+            return { text: `Бюджет на день: ${perDay} грн`, warning: false };
         }
+    },
+    methods: {
+        // Обробляє подію select від компонента TripCard: запам'ятовує обрану подорож, а деталі оновлюються автоматично
+        selectTrip(id) {
+            this.selectedTripId = id;
+        },
+        // Скидає власне повідомлення про помилку на полі напрямку під час введення
+        clearDestinationError() {
+            this.$refs.destinationInput.setCustomValidity('');
+        },
+        // Обробляє надсилання форми: перевіряє напрямок, додає подорож у реактивний масив (список оновиться сам) і очищає поля
+        addTrip() {
+            const destination = this.form.destination.trim();
 
-        body.classList.add('trip-card__body');
+            if (destination === '') {
+                const input = this.$refs.destinationInput;
+                input.setCustomValidity('Вкажіть назву напрямку');
+                input.reportValidity();
+                return;
+            }
 
-        title.textContent = trip.destination;
+            const nextId = Math.max(...this.trips.map(trip => trip.id)) + 1;
 
-        dates.classList.add('trip-card__dates');
-        dates.textContent = trip.dates;
+            this.trips.push({
+                id: nextId,
+                destination,
+                days: this.form.days,
+                budget: this.form.budget,
+                dates: 'Дати уточнюються',
+                status: 'planned',
+                image: '',
+                imageAlt: '',
+                description: 'Опис ще не додано'
+            });
 
-        details.textContent = `${trip.days} днів, ${trip.budget} грн`;
-
-        link.classList.add('view-details-link');
-        link.href = '#details';
-        link.textContent = 'Переглянути деталі';
-
-        body.append(createStatusBadge(trip.status), title, dates, details, link);
-        card.append(body);
-        listContainer.append(card);
-    });
-}
-
-// Оновлює підсумковий елемент: виводить кількість подорожей у списку
-function updateTripsCount(list) {
-    const counter = document.querySelector('#trips-count');
-    counter.textContent = `Кількість подорожей: ${list.length}`;
-}
-
-// Створює рядок деталей виду «Назва: значення» з виділеною назвою
-function createDetailRow(label, value) {
-    const row = document.createElement('p');
-    const name = document.createElement('strong');
-
-    name.textContent = label;
-    row.append(name, ` ${value}`);
-
-    return row;
-}
-
-// Показує деталі обраної подорожі в окремому блоці, повністю перебудовуючи його вміст
-function showTripDetails(trip) {
-    const statusRow = document.createElement('p');
-
-    detailsContent.innerHTML = '';
-
-    if (trip.image) {
-        const image = document.createElement('img');
-        image.src = trip.image;
-        image.alt = trip.imageAlt;
-        detailsContent.append(image);
+            this.form.destination = '';
+            this.form.days = '';
+            this.form.budget = '';
+        }
     }
-
-    statusRow.append(createStatusBadge(trip.status));
-
-    detailsContent.append(
-        statusRow,
-        createDetailRow('Напрямок:', trip.destination),
-        createDetailRow('Дати:', trip.dates),
-        createDetailRow('Тривалість:', `${trip.days} днів`),
-        createDetailRow('Бюджет:', `${trip.budget} грн`),
-        createDetailRow('Вартість на день:', `${costPerDay(trip)} грн`),
-        createDetailRow('Опис:', trip.description)
-    );
-}
-
-// Перераховує вартість дня «на льоту» і показує попередження, якщо бюджет на день менший за поріг
-function updateCostHint() {
-    const days = Number(daysInput.value);
-    const budget = Number(budgetInput.value);
-
-    if (daysInput.value === '' || budgetInput.value === '' || days < 1 || budget < 0) {
-        costHint.textContent = '';
-        costHint.classList.remove('warning');
-        return;
-    }
-
-    const perDay = costPerDay({ days, budget });
-    const tooLow = perDay < MIN_COST_PER_DAY;
-
-    if (tooLow) {
-        costHint.textContent = `Бюджет на день: ${perDay} грн. Це менше за ${MIN_COST_PER_DAY} грн, сума може бути замалою`;
-    } else {
-        costHint.textContent = `Бюджет на день: ${perDay} грн`;
-    }
-
-    costHint.classList.toggle('warning', tooLow);
-}
-
-// Обробник події click на картці подорожі (делегування на контейнер): виділяє картку й показує її деталі
-listContainer.addEventListener('click', event => {
-    const card = event.target.closest('.trip-card');
-
-    if (card === null) {
-        return;
-    }
-
-    const trip = trips.find(item => item.id === Number(card.dataset.tripId));
-
-    if (trip === undefined) {
-        return;
-    }
-
-    selectedTripId = trip.id;
-
-    listContainer.querySelectorAll('.trip-card').forEach(item => {
-        item.classList.toggle('selected', item === card);
-    });
-
-    showTripDetails(trip);
-});
-
-// Обробники input на полях днів і бюджету: оновлюють підказку з вартістю дня
-daysInput.addEventListener('input', updateCostHint);
-budgetInput.addEventListener('input', updateCostHint);
-
-// Обробник input на полі напрямку: скидає власне повідомлення про помилку
-destinationInput.addEventListener('input', () => {
-    destinationInput.setCustomValidity('');
-});
-
-// Обробник надсилання форми: скасовує перезавантаження, перевіряє поля, додає подорож у масив і перемальовує список
-form.addEventListener('submit', event => {
-    event.preventDefault();
-
-    const destination = destinationInput.value.trim();
-    const days = Number(daysInput.value);
-    const budget = Number(budgetInput.value);
-
-    if (destination === '') {
-        destinationInput.setCustomValidity('Вкажіть назву напрямку');
-        destinationInput.reportValidity();
-        return;
-    }
-
-    const newTrip = {
-        id: getNextId(trips),
-        destination,
-        days,
-        budget,
-        dates: 'Дати уточнюються',
-        status: 'planned',
-        image: '',
-        imageAlt: '',
-        description: 'Опис ще не додано'
-    };
-
-    trips.push(newTrip);
-
-    renderTrips(trips);
-    updateTripsCount(trips);
-
-    form.reset();
-    updateCostHint();
-});
-
-printTripsSummary(trips);
-
-for (const trip of trips) {
-    console.log(`${trip.destination}: ${costPerDay(trip)} на день`);
-}
-
-renderTrips(trips);
-updateTripsCount(trips);
-showTripDetails(trips[0]);
+}).mount('#app');
 
 const COUNTRY_API_URL = 'https://restcountries.com/v3.1/name/';
 
