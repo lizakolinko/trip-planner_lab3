@@ -74,6 +74,35 @@
             </section>
         </div>
 
+        <section id="route">
+            <h2>Маршрут подорожі</h2>
+            <form class="trip-form" id="stop-form" action="#" method="post">
+                <div class="form-row">
+                    <label for="stop-country-input">Країна</label>
+                    <input type="text" id="stop-country-input" name="country" placeholder="Наприклад, Португалія" required>
+                </div>
+                <div class="form-row">
+                    <label for="stop-city-input">Місто</label>
+                    <input type="text" id="stop-city-input" name="city" placeholder="Наприклад, Лісабон" required>
+                </div>
+                <div class="form-row">
+                    <label for="stop-from-input">Дата початку</label>
+                    <input type="date" id="stop-from-input" name="dateFrom" required>
+                </div>
+                <div class="form-row">
+                    <label for="stop-to-input">Дата завершення</label>
+                    <input type="date" id="stop-to-input" name="dateTo" required>
+                </div>
+                <div class="form-row">
+                    <label for="stop-notes-input">Нотатки</label>
+                    <input type="text" id="stop-notes-input" name="notes" placeholder="Що не забути" maxlength="200">
+                </div>
+                <button type="submit">Додати пункт</button>
+            </form>
+            <p class="stops-status" id="stops-status" aria-live="polite"></p>
+            <div class="stops-list" id="stops-list"></div>
+        </section>
+
         <section id="country">
             <h2>Інформація про країну</h2>
             <form class="trip-form country-form" id="country-form" action="#" method="get">
@@ -113,7 +142,7 @@
 </div>
 
 <footer class="site-footer">
-    <p>Навчальний проєкт «Планувальник подорожей». Практична робота №10, ПВЗ, ФІОТ КПІ. &copy; 2026</p>
+    <p>Навчальний проєкт «Планувальник подорожей». Практична робота №11, ПВЗ, ФІОТ КПІ. &copy; 2026</p>
 </footer>
 
 <script src="js/app.js"></script>
